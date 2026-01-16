@@ -4,15 +4,38 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
 
 export default function Index() {
   const [activeSection, setActiveSection] = useState('hero');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { toast } = useToast();
 
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId);
+    setMenuOpen(false);
     const element = document.getElementById(sectionId);
     element?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleContactSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get('name');
+    const email = formData.get('email');
+    const message = formData.get('message');
+
+    toast({
+      title: 'Сообщение отправлено!',
+      description: `Спасибо, ${name}! Я свяжусь с вами в ближайшее время.`,
+    });
+
+    e.currentTarget.reset();
   };
 
   const achievements = [
@@ -69,6 +92,7 @@ export default function Index() {
                 { id: 'portfolio', label: 'Портфолио' },
                 { id: 'parents', label: 'Родителям' },
                 { id: 'gallery', label: 'Галерея' },
+                { id: 'contact', label: 'Контакты' },
               ].map((item) => (
                 <button
                   key={item.id}
@@ -81,6 +105,41 @@ export default function Index() {
                 </button>
               ))}
             </div>
+            <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Icon name="Menu" size={24} />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px]">
+                <SheetHeader>
+                  <SheetTitle className="font-heading">Навигация</SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col gap-4 mt-8">
+                  {[
+                    { id: 'hero', label: 'Главная', icon: 'Home' },
+                    { id: 'about', label: 'Обо мне', icon: 'User' },
+                    { id: 'portfolio', label: 'Портфолио', icon: 'Award' },
+                    { id: 'parents', label: 'Родителям', icon: 'Heart' },
+                    { id: 'gallery', label: 'Галерея', icon: 'Image' },
+                    { id: 'contact', label: 'Контакты', icon: 'Mail' },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => scrollToSection(item.id)}
+                      className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                        activeSection === item.id
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-accent'
+                      }`}
+                    >
+                      <Icon name={item.icon as any} size={20} />
+                      <span className="font-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </nav>
@@ -468,6 +527,75 @@ export default function Index() {
         </div>
       </section>
 
+      <section id="contact" className="py-20 px-4 bg-gradient-to-b from-accent/30 to-transparent">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-12 animate-fade-in">
+            <h2 className="font-heading text-3xl md:text-4xl font-bold mb-4">Обратная связь</h2>
+            <p className="text-muted-foreground text-lg">Есть вопросы? Напишите мне!</p>
+          </div>
+
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle className="font-heading text-2xl">Форма обратной связи</CardTitle>
+              <CardDescription>
+                Заполните форму ниже, и я отвечу вам в ближайшее время
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleContactSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Ваше имя</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    placeholder="Введите ваше имя"
+                    required
+                    className="w-full"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email или телефон</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="example@mail.ru"
+                    required
+                    className="w-full"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="message">Ваше сообщение</Label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    placeholder="Напишите ваш вопрос или пожелание..."
+                    required
+                    className="w-full min-h-[120px]"
+                  />
+                </div>
+
+                <Button type="submit" size="lg" className="w-full gap-2">
+                  <Icon name="Send" size={18} />
+                  Отправить сообщение
+                </Button>
+              </form>
+
+              <div className="mt-6 pt-6 border-t">
+                <p className="text-sm text-muted-foreground text-center">
+                  Или свяжитесь со мной напрямую: <br />
+                  <a href="mailto:educator180@example.com" className="text-primary hover:underline">
+                    educator180@example.com
+                  </a>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       <footer className="py-12 px-4 bg-gradient-to-b from-transparent to-muted/30 border-t">
         <div className="container mx-auto max-w-4xl">
           <div className="grid md:grid-cols-2 gap-8">
@@ -506,7 +634,7 @@ export default function Index() {
           </div>
 
           <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-            <p>© 2024 Портфолио воспитателя МБДОУ «Детский сад № 180». Все права защищены.</p>
+            <p>© 2023 Портфолио воспитателя МБДОУ «Детский сад № 180». Все права защищены.</p>
           </div>
         </div>
       </footer>
