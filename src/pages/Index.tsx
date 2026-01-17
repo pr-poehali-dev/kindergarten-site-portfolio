@@ -23,19 +23,42 @@ export default function Index() {
     element?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleContactSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const name = formData.get('name');
-    const email = formData.get('email');
-    const message = formData.get('message');
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const message = formData.get('message') as string;
 
-    toast({
-      title: 'Сообщение отправлено!',
-      description: `Спасибо, ${name}! Я свяжусь с вами в ближайшее время.`,
-    });
+    try {
+      const response = await fetch('https://functions.poehali.dev/02ca222d-1dcc-4819-9dac-cd85a1360f91', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, message }),
+      });
 
-    e.currentTarget.reset();
+      if (response.ok) {
+        toast({
+          title: 'Сообщение отправлено!',
+          description: `Спасибо, ${name}! Я свяжусь с вами в ближайшее время.`,
+        });
+        e.currentTarget.reset();
+      } else {
+        toast({
+          title: 'Ошибка отправки',
+          description: 'Попробуйте позже или свяжитесь другим способом.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка отправки',
+        description: 'Проверьте подключение к интернету.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const achievements = [

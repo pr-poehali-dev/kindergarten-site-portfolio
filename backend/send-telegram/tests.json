@@ -1,0 +1,30 @@
+{
+  "tests": [
+    {
+      "name": "Test valid contact form submission",
+      "method": "POST",
+      "body": {
+        "name": "Тестовый пользователь",
+        "email": "test@example.com",
+        "message": "Это тестовое сообщение"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test missing fields",
+      "method": "POST",
+      "body": {
+        "name": "Тест"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
