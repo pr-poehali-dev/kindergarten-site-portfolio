@@ -1,0 +1,20 @@
+{
+  "tests": [
+    {
+      "name": "Test webhook accepts POST requests",
+      "method": "POST",
+      "body": {
+        "message": {
+          "chat": {"id": 123456},
+          "from": {"first_name": "Test", "username": "testuser"},
+          "text": "/start"
+        }
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "ok": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
